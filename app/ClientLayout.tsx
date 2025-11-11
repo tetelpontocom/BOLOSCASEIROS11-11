@@ -1,11 +1,11 @@
 "use client"
 
 import type React from "react"
-
+import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
-export default function ClientLayout({
+function ClientLayoutContent({
   children,
 }: {
   children: React.ReactNode
@@ -47,5 +47,23 @@ export default function ClientLayout({
 
       {children}
     </div>
+  )
+}
+
+export default function ClientLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="antialiased bg-[#FFF8F3] text-gray-900 font-[Inter,sans-serif] min-h-screen flex flex-col">
+          {children}
+        </div>
+      }
+    >
+      <ClientLayoutContent>{children}</ClientLayoutContent>
+    </Suspense>
   )
 }
