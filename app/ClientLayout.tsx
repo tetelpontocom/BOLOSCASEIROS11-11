@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from "react"
 
 function ClientLayoutContent({
@@ -19,6 +19,40 @@ function ClientLayoutContent({
       setFromTetelPontocom(true)
     }
   }, [searchParams])
+
+  useEffect(() => {
+    if (!(window as any).fbq) return
+    const fbq = (window as any).fbq
+
+    // PageView ao carregar
+    fbq("track", "PageView")
+    console.log("✅ Pixel: PageView registrado (Bolos Caseiros)")
+
+    // Lead (clique nos botões principais)
+    const ctas = document.querySelectorAll("a, button")
+    ctas.forEach((el) => {
+      el.addEventListener("click", () => {
+        const label =
+          el.getAttribute("aria-label") ||
+          el.textContent?.trim() ||
+          "Lead-Desconhecido"
+        fbq("trackCustom", "LeadClick", { label })
+        console.log(`🎯 Lead registrado: ${label}`)
+      })
+    })
+
+    // Simulação de intenção de compra
+    const start = Date.now()
+    const timer = setInterval(() => {
+      const timeSpent = Math.floor((Date.now() - start) / 1000)
+      if (timeSpent === 30) {
+        fbq("trackCustom", "EngajamentoProduto", { segundos: 30 })
+        console.log("🕒 Engajamento inicial detectado (30s)")
+      }
+    }, 5000)
+
+    return () => clearInterval(timer)
+  }, [])
 
   return (
     <div className="antialiased bg-[#FFF8F3] text-gray-900 font-[Inter,sans-serif] min-h-screen flex flex-col">
